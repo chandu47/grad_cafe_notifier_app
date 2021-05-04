@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:grad_cafe_notifier_app/models/instInfo.dart';
 
 class SettingsCard extends StatefulWidget {
   final Function _cancelHandler;
   final Function _saveHandler;
+  InstInfo instInfo;
 
 
-  SettingsCard(this._cancelHandler, this._saveHandler);
+  SettingsCard(this._cancelHandler, this._saveHandler, {this.instInfo});
 
   @override
-  _SettingsCardState createState() => _SettingsCardState(_cancelHandler, _saveHandler);
+  _SettingsCardState createState() => _SettingsCardState(_cancelHandler, _saveHandler, instInfo: instInfo);
 }
 
 class _SettingsCardState extends State<SettingsCard> {
   Function _cancelHandler;
   Function _saveHandler;
+  InstInfo instInfo;
   String _seasonValue = 'Season';
   String _degreeValue = 'Degree';
+  String _courseName;
+  String _universityName;
 
-  _SettingsCardState(this._cancelHandler, this._saveHandler);
+  _SettingsCardState(this._cancelHandler, this._saveHandler, {this.instInfo});
+
+  @override
+  void initState() {
+    super.initState();
+    if(instInfo != null && instInfo.isNotEmpty){
+      _seasonValue = instInfo.season;
+      _degreeValue = instInfo.degree;
+      _courseName = instInfo.courseName;
+      _universityName = instInfo.instName;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +60,7 @@ class _SettingsCardState extends State<SettingsCard> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                     SizedBox(width: 20,),
-                    _buildTextFieldEntry('University'),
+                    _buildUniversityTextFieldEntry('University'),
                    SizedBox(width: 40,),
                     _buildDropBoxDegreeEntry(<String>['Degree','MS','Ph.D','MBA']),
                 ],
@@ -54,7 +70,7 @@ class _SettingsCardState extends State<SettingsCard> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(width: 20,),
-                  _buildTextFieldEntry('Course'),
+                  _buildCourseTextFieldEntry('Course'),
                   SizedBox(width: 40,),
                   _buildDropBoxSeasonEntry(<String>['Season','S21','F21','S22'])
                 ],
@@ -63,8 +79,9 @@ class _SettingsCardState extends State<SettingsCard> {
               ButtonBar(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  FlatButton(onPressed: _cancelHandler, child: Text('Cancel')),
-                  FlatButton(onPressed: widget._saveHandler, child: Text('Save'))
+                  TextButton(onPressed: (){_cancelHandler();}, child: Text('Cancel')),
+                  TextButton(onPressed: () {
+                    _saveHandler(InstInfo("69", _universityName, _courseName, _seasonValue, _degreeValue)); }, child: Text('Save'))
                 ],
               )
             ],
@@ -72,14 +89,37 @@ class _SettingsCardState extends State<SettingsCard> {
         )
   );
 
-  Widget _buildTextFieldEntry(String type) => SizedBox(
+  Widget _buildUniversityTextFieldEntry(String type) => SizedBox(
       width: 200,
       child:
-      TextField(
+      TextFormField(
+        initialValue: _universityName != null ? _universityName: "",
+        decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: type,
+        ),
+        onChanged: (value){
+          setState(() {
+            _universityName = value;
+          });
+        },
+      )
+  );
+
+  Widget _buildCourseTextFieldEntry(String type) => SizedBox(
+      width: 200,
+      child:
+      TextFormField(
+        initialValue: _courseName != null ? _courseName: "",
         decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: type
         ),
+        onChanged: (value){
+          setState(() {
+            _courseName = value;
+          });
+        },
       )
   );
 
@@ -90,7 +130,7 @@ class _SettingsCardState extends State<SettingsCard> {
       value: _degreeValue,
       onChanged: (value) {
           setState(() {
-            _degreeValue = value;
+            _degreeValue = value as String;
           });
       });
 
@@ -101,7 +141,7 @@ class _SettingsCardState extends State<SettingsCard> {
           value: _seasonValue,
           onChanged: (value) {
             setState(() {
-              _seasonValue = value;
+              _seasonValue = value as String;
             });
           });
 }

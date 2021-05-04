@@ -4,11 +4,22 @@ import 'package:url_launcher/url_launcher.dart';
 
 
 class FeedScreen extends StatefulWidget {
+  String deviceId;
+
+
+  FeedScreen(this.deviceId);
+
   @override
-  _FeedScreenState createState() => _FeedScreenState();
+  _FeedScreenState createState() => _FeedScreenState(this.deviceId);
 }
 
 class _FeedScreenState extends State<FeedScreen> {
+
+  String deviceId;
+
+
+  _FeedScreenState(this.deviceId);
+
   @override
   Widget build(BuildContext context) {
     return

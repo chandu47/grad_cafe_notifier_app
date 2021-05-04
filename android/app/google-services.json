@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "236782933528",
+    "project_id": "gc-notifier-be",
+    "storage_bucket": "gc-notifier-be.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236782933528:android:b3dda0943c3b2844b7956d",
+        "android_client_info": {
+          "package_name": "com.cotinga.grad_cafe_notifier_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "236782933528-tphpuhprcjto2qdhjl2kl7n5niqeadkc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDY0mLxmGcauULQ3diZYIqhoHb-ZH2QXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236782933528-tphpuhprcjto2qdhjl2kl7n5niqeadkc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
