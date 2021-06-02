@@ -3,8 +3,9 @@ import 'package:grad_cafe_notifier_app/orchestration/model/user.dart';
 import 'package:grad_cafe_notifier_app/orchestration/repository/register_repo.dart';
 import 'package:grad_cafe_notifier_app/screens/feedScreen.dart';
 import 'package:grad_cafe_notifier_app/screens/settingScreen.dart';
-import 'package:grad_cafe_notifier_app/tools/FirebaseServiceManager.dart';
+import 'package:grad_cafe_notifier_app/tools/firebase_service_manager.dart';
 import 'package:grad_cafe_notifier_app/tools/result.dart';
+import 'package:grad_cafe_notifier_app/tools/shared_pref_provider.dart';
 import 'package:grad_cafe_notifier_app/widgets/info_dialog.dart';
 import 'package:grad_cafe_notifier_app/widgets/loading_dialog.dart';
 import 'package:grad_cafe_notifier_app/widgets/settingsCard.dart';
@@ -24,7 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isRegistered = false;
   String deviceId;
   String firebaseToken;
-  FirebaseServiceManager firebaseManager = FirebaseServiceManager();
   RegisterRepo registerRepo = RegisterRepo();
   User newUserInfo;
 
@@ -46,13 +46,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _readProps() async{
     final sharedPref = await SharedPreferences.getInstance();
-    deviceId = sharedPref.getString("deviceId");
-    isRegistered = sharedPref.getBool("isRegistered");
-    firebaseToken = sharedPref.getString("deviceToken");
-    await firebaseManager.init();
+    deviceId = await SharedPrefProvider.sharedPref.deviceId;
+    isRegistered = await SharedPrefProvider.sharedPref.isRegistered;
+    firebaseToken = await SharedPrefProvider.sharedPref.firebaseToken;
     //get firebase token
     String newFirebaseToken;
-    await firebaseManager.getToken().then((value) => newFirebaseToken=value);
+    await FirebaseServiceManager.firebaseServiceManager.token.then((value) => newFirebaseToken=value);
 
     _showIntroDialog = ! (deviceId != null && isRegistered != null && isRegistered);
 
@@ -63,8 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
       //registerApi call
       await _registerApiDialog(user);
 
-      sharedPref.setString("deviceId", newUserInfo.deviceId);
-      sharedPref.setString("deviceToken", newUserInfo.device_token);
+      if(newUserInfo != null &&  newUserInfo.device_token != null) {
+        await SharedPrefProvider.sharedPref.setDeviceId(newUserInfo.deviceId);
+        await SharedPrefProvider.sharedPref.setFirebaseToken(newFirebaseToken);
+        await SharedPrefProvider.sharedPref.setIsRegistered(true);
+        }
     }
     else if(newFirebaseToken != firebaseToken) {
       //update the firebase token
@@ -77,8 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
         SettingScreen(newUserInfo.deviceId)
       ];
     });
-
-
   }
 
   @override
@@ -213,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   newUserInfo = (snapshot.data as SuccessState).value;
                   return InfoDialog("Registration complete", context);
                 } else if(snapshot.data is ErrorState){
-                  return InfoDialog("Registration Failed", context);
+                  return InfoDialog("Registration Failed... Please try again later", context);
                 }
                 else{
                   return LoadingDialog("Registering the device", context);
